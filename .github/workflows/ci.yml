@@ -1,0 +1,44 @@
+# Fast checks on every push and pull request: the offline test tier, the linter
+# and both type checkers. The end-to-end tier (`-m e2e`) downloads real BGP
+# archives, runs for a quarter of an hour and needs ~11 GB of memory, so it is
+# run by hand before a release rather than here.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: unit tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv python install ${{ matrix.python }}
+      - run: uv sync --python ${{ matrix.python }} --group test
+      - run: uv run pytest
+
+  lint-and-types:
+    name: ruff, ty, pyright
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --group test
+      # pyright and ty check examples/ too, so they need its imports. The
+      # `examples` group is not synced whole because `pybgpstream` needs the
+      # libbgpstream C library, which the runner does not have.
+      - run: uv pip install marimo matplotlib polars
+      - run: uvx ruff check
+      - run: uvx ty check
+      - run: uvx pyright

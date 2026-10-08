@@ -1,0 +1,26 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+cache
+
+.vscode
+
+logs
+*sqlite
+
+__marimo__
+examples/hegemony.html
+playground.py
+# Stale pre-rewrite code, moved out of the tree
+archive
+
+# mkdocs build output
+site

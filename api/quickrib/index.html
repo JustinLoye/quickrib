@@ -1,0 +1,3438 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="BGP routing table reconstruction and analysis">
+      
+      
+        <meta name="author" content="JustinLoye">
+      
+      
+      
+        <link rel="prev" href="../overview/">
+      
+      
+        <link rel="next" href="../rib_table/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>QuickRIB - QuickRIB</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#quickrib" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="QuickRIB" class="md-header__button md-logo" aria-label="QuickRIB" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            QuickRIB
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              QuickRIB
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/JustinLoye/quickrib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    quickrib
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting_started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guide/reconstruction/" class="md-tabs__link">
+          
+  
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../performance/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Performance
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="QuickRIB" class="md-nav__button md-logo" aria-label="QuickRIB" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    QuickRIB
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/JustinLoye/quickrib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    quickrib
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/reconstruction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reconstruction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/observers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/hegemony/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AS Hegemony
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/ioda/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IODA Signal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/bgplay/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BGPlay
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/update_tagger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Update Classification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/mad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Anomaly Detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QuickRIB
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QuickRIB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QuickRIBConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="QuickRIBConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.start_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        start_time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.end_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        end_time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.dump_res" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dump_res
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.collectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        collectors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.cache_dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cache_dir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.parser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        parser
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.fullfeed_only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fullfeed_only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.rib_lookback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        rib_lookback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.rib_cls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        rib_cls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIB" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QuickRIB
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="QuickRIB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIB.initialize_processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        initialize_processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helpers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickrib.quickrib.process_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        process_path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickrib.quickrib.elapsed_dump_boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        elapsed_dump_boundaries
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rib_table/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RIBTable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../observers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QuickRIBConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="QuickRIBConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.start_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        start_time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.end_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        end_time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.dump_res" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dump_res
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.collectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        collectors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.cache_dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cache_dir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.parser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        parser
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.fullfeed_only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fullfeed_only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.rib_lookback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        rib_lookback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIBConfig.rib_cls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        rib_cls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIB" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QuickRIB
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="QuickRIB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quickrib.quickrib.QuickRIB.initialize_processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        initialize_processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helpers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickrib.quickrib.process_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        process_path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickrib.quickrib.elapsed_dump_boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        elapsed_dump_boundaries
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="quickrib">QuickRIB</h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="quickrib.quickrib.QuickRIBConfig" class="doc doc-heading">
+            <code>quickrib.quickrib.QuickRIBConfig</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+        <p>QuickRIB analysis config</p>
+
+      <details><summary>Show JSON schema:</summary>
+        <div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;$defs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;FilterOptions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A unified model for the available filter options.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;origin_asn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by the origin AS number.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Origin Asn&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;prefix&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by an exact prefix match.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Prefix&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;prefix_super&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by the exact prefix and its more general super-prefixes.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Prefix Super&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;prefix_sub&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by the exact prefix and its more specific sub-prefixes.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Prefix Sub&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;prefix_super_sub&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by the exact prefix and both its super- and sub-prefixes.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Prefix Super Sub&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;peer_ip&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ipv4&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ipv6&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by the IP address of a single BGP peer.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Peer Ip&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;peer_ips&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                  </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">                  </span><span class="p">},</span>
+<span class="w">                  </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ipv4&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">                  </span><span class="p">},</span>
+<span class="w">                  </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ipv6&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">                  </span><span class="p">}</span>
+<span class="w">                </span><span class="p">]</span>
+<span class="w">              </span><span class="p">},</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;array&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by a list of BGP peer IP addresses.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Peer Ips&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;peer_asn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by the AS number of the BGP peer.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Peer Asn&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;update_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;enum&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="s2">&quot;withdraw&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="s2">&quot;announce&quot;</span>
+<span class="w">              </span><span class="p">],</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by the BGP update message type.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Update Type&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;as_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by a regular expression matching the AS path.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;As Path&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;ip_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;enum&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="mi">4</span><span class="p">,</span>
+<span class="w">                </span><span class="mi">6</span>
+<span class="w">              </span><span class="p">],</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Filter by ip version.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Ip Version&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;FilterOptions&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;QuickRIB analysis config&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;start_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Start of the analysis&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date-time&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Start Time&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;end_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;End of the analysis&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date-time&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;End Time&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;dump_res&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Time between to dump of analysis modules&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;duration&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Dump Res&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;collectors&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;List of collectors to get data from&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Collectors&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;array&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;filters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/$defs/FilterOptions&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Optional filters&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;cache_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;path&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Directory for the downloaded archives, created if missing. Reuse it across runs.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Cache Dir&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;parser&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;enum&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;pybgpkit&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;bgpkit&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;pybgpstream&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;bgpdump&quot;</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pybgpkit&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MRT files parser. Default `pybgpkit` is installed but slow, the others are system dependencies.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Parser&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;fullfeed_only&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Only use data from peer sharing their full routing table&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Fullfeed Only&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;boolean&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;rib_lookback&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;P1D&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;How far before `start_time` to look for each collector&#39;s most recent RIB dump. Widen it only for a collector with a gap in its archive.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;duration&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rib Lookback&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;rib_cls&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Class used to store the RIB. A subclass such as `RIBTablePathHistory` enriches node data; see AGENTS.md &#39;RIB flavors&#39;.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rib Cls&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;start_time&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;end_time&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;dump_res&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;collectors&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;QuickRIBConfig&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+      </details>
+    
+
+        <p>Fields:</p>
+        <ul>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="start_time
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.start_time)" href="#quickrib.quickrib.QuickRIBConfig.start_time">start_time</a></code>
+                (<code><span title="datetime.datetime">datetime</span></code>)
+            </li>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="end_time
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.end_time)" href="#quickrib.quickrib.QuickRIBConfig.end_time">end_time</a></code>
+                (<code><span title="datetime.datetime">datetime</span></code>)
+            </li>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="dump_res
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.dump_res)" href="#quickrib.quickrib.QuickRIBConfig.dump_res">dump_res</a></code>
+                (<code><span title="datetime.timedelta">timedelta</span></code>)
+            </li>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="collectors
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.collectors)" href="#quickrib.quickrib.QuickRIBConfig.collectors">collectors</a></code>
+                (<code><span title="list">list</span>[<span title="str">str</span>]</code>)
+            </li>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="filters = None
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.filters)" href="#quickrib.quickrib.QuickRIBConfig.filters">filters</a></code>
+                (<code><span title="pybgpflux.FilterOptions">FilterOptions</span> | None</code>)
+            </li>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="cache_dir = None
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.cache_dir)" href="#quickrib.quickrib.QuickRIBConfig.cache_dir">cache_dir</a></code>
+                (<code><span title="pathlib.Path">Path</span> | None</code>)
+            </li>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="parser = 'pybgpkit'
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.parser)" href="#quickrib.quickrib.QuickRIBConfig.parser">parser</a></code>
+                (<code><span title="quickrib.quickrib.ParserName">ParserName</span> | None</code>)
+            </li>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="fullfeed_only = True
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.fullfeed_only)" href="#quickrib.quickrib.QuickRIBConfig.fullfeed_only">fullfeed_only</a></code>
+                (<code><span title="bool">bool</span></code>)
+            </li>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="rib_lookback = RIB_LOOKBACK
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.rib_lookback)" href="#quickrib.quickrib.QuickRIBConfig.rib_lookback">rib_lookback</a></code>
+                (<code><span title="datetime.timedelta">timedelta</span></code>)
+            </li>
+            <li>
+              <code><a class="autorefs autorefs-internal" title="rib_cls = RIBTable
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.rib_cls)" href="#quickrib.quickrib.QuickRIBConfig.rib_cls">rib_cls</a></code>
+                (<code><span title="type">type</span>[<a class="autorefs autorefs-internal" title="quickrib.rib_table.RIBTable" href="../rib_table/#quickrib.rib_table.RIBTable">RIBTable</a>]</code>)
+            </li>
+        </ul>
+
+        <p>Validators:</p>
+        <ul>
+            <li>
+              <code><span title="quickrib.quickrib.QuickRIBConfig.normalize_to_utc">normalize_to_utc</span></code>
+                &rarr;
+                  <code><a class="autorefs autorefs-internal" title="start_time
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.start_time)" href="#quickrib.quickrib.QuickRIBConfig.start_time">start_time</a></code>,                   <code><a class="autorefs autorefs-internal" title="end_time
+
+  
+      pydantic-field
+   (quickrib.quickrib.QuickRIBConfig.end_time)" href="#quickrib.quickrib.QuickRIBConfig.end_time">end_time</a></code>            </li>
+            <li>
+              <code><span title="quickrib.quickrib.QuickRIBConfig.check_window">check_window</span></code>
+            </li>
+        </ul>
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/quickrib/quickrib.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">QuickRIBConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;QuickRIB analysis config&quot;&quot;&quot;</span>
+
+    <span class="n">start_time</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Start of the analysis&quot;</span><span class="p">)</span>
+    <span class="n">end_time</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;End of the analysis&quot;</span><span class="p">)</span>
+    <span class="n">dump_res</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Time between to dump of analysis modules&quot;</span>
+    <span class="p">)</span>
+    <span class="n">collectors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of collectors to get data from&quot;</span><span class="p">)</span>
+    <span class="n">filters</span><span class="p">:</span> <span class="n">FilterOptions</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Optional filters&quot;</span><span class="p">)</span>
+    <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Directory for the downloaded archives, created if missing. Reuse it across runs.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="p">:</span> <span class="n">ParserName</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;pybgpkit&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;MRT files parser. Default `pybgpkit` is installed but slow, the others are system dependencies.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">fullfeed_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Only use data from peer sharing their full routing table&quot;</span><span class="p">)</span>
+    <span class="n">rib_lookback</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">RIB_LOOKBACK</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;How far before `start_time` to look for each collector&#39;s most &quot;</span>
+            <span class="s2">&quot;recent RIB dump. Widen it only for a collector with a gap in its &quot;</span>
+            <span class="s2">&quot;archive.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">rib_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">RIBTable</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">RIBTable</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Class used to store the RIB. A subclass such as `RIBTablePathHistory` enriches node data; see AGENTS.md &#39;RIB flavors&#39;.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;start_time&quot;</span><span class="p">,</span> <span class="s2">&quot;end_time&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">normalize_to_utc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">to_utc</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_window</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuickRIBConfig&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;end_time (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">) must be after &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;start_time (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_res</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dump_res must be positive, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dump_res</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.start_time" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">start_time</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Start of the analysis</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.end_time" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">end_time</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>End of the analysis</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.dump_res" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">dump_res</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Time between to dump of analysis modules</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.collectors" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">collectors</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>List of collectors to get data from</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.filters" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">filters</span> <span class="o">=</span> <span class="kc">None</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Optional filters</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.cache_dir" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">cache_dir</span> <span class="o">=</span> <span class="kc">None</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Directory for the downloaded archives, created if missing. Reuse it across runs.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.parser" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">parser</span> <span class="o">=</span> <span class="s1">&#39;pybgpkit&#39;</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>MRT files parser. Default <code>pybgpkit</code> is installed but slow, the others are system dependencies.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.fullfeed_only" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">fullfeed_only</span> <span class="o">=</span> <span class="kc">True</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Only use data from peer sharing their full routing table</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.rib_lookback" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">rib_lookback</span> <span class="o">=</span> <span class="n">RIB_LOOKBACK</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>How far before <code>start_time</code> to look for each collector's most recent RIB dump. Widen it only for a collector with a gap in its archive.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="quickrib.quickrib.QuickRIBConfig.rib_cls" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">rib_cls</span> <span class="o">=</span> <span class="n">RIBTable</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Class used to store the RIB. A subclass such as <code>RIBTablePathHistory</code> enriches node data; see AGENTS.md 'RIB flavors'.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="quickrib.quickrib.QuickRIB" class="doc doc-heading">
+            <code>quickrib.quickrib.QuickRIB</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/quickrib/quickrib.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">QuickRIB</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">start_time</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
+        <span class="n">end_time</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
+        <span class="n">dump_res</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">,</span>
+        <span class="n">collectors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FilterOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">parser</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ParserName</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;pybgpkit&quot;</span><span class="p">,</span>
+        <span class="n">fullfeed_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">rib_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">RIBTable</span><span class="p">]</span> <span class="o">=</span> <span class="n">RIBTable</span><span class="p">,</span>
+        <span class="n">rib_lookback</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="o">=</span> <span class="n">RIB_LOOKBACK</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># The dump schedule advances in `dump_res` steps until it reaches the</span>
+        <span class="c1"># stream&#39;s clock, so a non-positive step would not merely disable</span>
+        <span class="c1"># dumping, it would not terminate.</span>
+        <span class="k">if</span> <span class="n">dump_res</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dump_res must be positive, got </span><span class="si">{</span><span class="n">dump_res</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># The same normalisation `QuickRIBConfig` applies, so constructing a</span>
+        <span class="c1"># pipeline directly behaves the same. Without it a naive datetime is</span>
+        <span class="c1"># read in local time by `timestamp()`, which shifts every dump boundary,</span>
+        <span class="c1"># and cannot be compared with the broker&#39;s aware dump times at all.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">to_utc</span><span class="p">(</span><span class="n">start_time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">to_utc</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;end_time (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">) must be after &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;start_time (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dump_res</span> <span class="o">=</span> <span class="n">dump_res</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="n">filters</span>
+        <span class="c1"># Created here rather than left to the first download, so a typo in the</span>
+        <span class="c1"># path fails before the broker is queried.</span>
+        <span class="k">if</span> <span class="n">cache_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">cache_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fullfeed_only</span> <span class="o">=</span> <span class="n">fullfeed_only</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rib_lookback</span> <span class="o">=</span> <span class="n">rib_lookback</span>
+        <span class="c1"># Copied: collectors with no RIB dump in the window are dropped from</span>
+        <span class="c1"># this list, and that must not reach back into the caller&#39;s.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">collectors</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rib</span> <span class="o">=</span> <span class="n">rib_cls</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">QuickRIBConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">start_time</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+            <span class="n">end_time</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">end_time</span><span class="p">,</span>
+            <span class="n">dump_res</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">dump_res</span><span class="p">,</span>
+            <span class="n">collectors</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">collectors</span><span class="p">,</span>
+            <span class="n">filters</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span>
+            <span class="n">cache_dir</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+            <span class="n">parser</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">parser</span><span class="p">,</span>
+            <span class="n">fullfeed_only</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">fullfeed_only</span><span class="p">,</span>
+            <span class="n">rib_cls</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">rib_cls</span><span class="p">,</span>
+            <span class="n">rib_lookback</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">rib_lookback</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize route collector RIB processing.</span>
+
+<span class="sd">        This function initializes the processing of Routing Information Base (RIB) data every route collectors.</span>
+<span class="sd">        It returns the start and end times of each collectors&#39;s RIB and identifies the full-feed peers.</span>
+
+<span class="sd">        Sets ``rc_to_rib_start``, ``rc_to_rib_end`` and ``rc_to_ff_peers`` on the</span>
+<span class="sd">        instance, and hands the full-feed selection to the observers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Where each collector&#39;s table actually is. `start_time` does not have</span>
+        <span class="c1"># to sit on a dump: the reconstruction starts from the last dump before</span>
+        <span class="c1"># it, and `replay_updates` replays the interval in between.</span>
+        <span class="n">rib_dumps</span> <span class="o">=</span> <span class="n">latest_rib_dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rib_lookback</span><span class="p">)</span>
+
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">rc</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span> <span class="k">if</span> <span class="n">rc</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rib_dumps</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;No RIB dump for collector </span><span class="si">%s</span><span class="s2"> in the </span><span class="si">%s</span><span class="s2"> before </span><span class="si">%s</span><span class="s2">, dropping it&quot;</span><span class="p">,</span>
+                <span class="n">rc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rib_lookback</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;No collector has a RIB dump in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rib_lookback</span><span class="si">}</span><span class="s2"> before &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">, so there is no table to build. &quot;</span>
+                <span class="s2">&quot;Check the collector names, or widen `rib_lookback`.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">rc</span><span class="p">,</span> <span class="n">dump_time</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rib_dumps</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">catch_up</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">-</span> <span class="n">dump_time</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> dumps at </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2"> before start_time&quot;</span><span class="p">,</span>
+                <span class="n">rc</span><span class="p">,</span> <span class="n">dump_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">catch_up</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Stream #1: count unique prefixes and identify FF peers, one collector</span>
+        <span class="c1"># at a time. Collectors dump at different instants, and a single window</span>
+        <span class="c1"># spanning all of them would pull in every intermediate dump of the</span>
+        <span class="c1"># collectors that dump more often.</span>
+        <span class="n">rc_to_rib_times</span> <span class="o">=</span> <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">}</span>
+        <span class="n">rc_to_peer_to_prefixes</span> <span class="o">=</span> <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">}</span>
+        <span class="n">rc_to_unique_prefixes</span> <span class="o">=</span> <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">BGPStream</span><span class="p">(</span>
+                <span class="n">ts_start</span><span class="o">=</span><span class="n">rib_dumps</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span> <span class="o">-</span> <span class="n">RIB_DUMP_MARGIN</span><span class="p">,</span>
+                <span class="n">ts_end</span><span class="o">=</span><span class="n">rib_dumps</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span> <span class="o">+</span> <span class="n">RIB_DUMP_MARGIN</span><span class="p">,</span>
+                <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ribs&quot;</span><span class="p">],</span>
+                <span class="n">collectors</span><span class="o">=</span><span class="p">[</span><span class="n">rc</span><span class="p">],</span>
+                <span class="n">filters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+                <span class="n">parser_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+                <span class="n">ts</span><span class="p">,</span> <span class="n">pfx</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
+                <span class="n">rc_to_rib_times</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+                <span class="n">rc_to_unique_prefixes</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pfx</span><span class="p">)</span>
+                <span class="n">rc_to_peer_to_prefixes</span><span class="p">[</span><span class="n">rc</span><span class="p">][(</span><span class="n">elem</span><span class="o">.</span><span class="n">peer_asn</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">peer_address</span><span class="p">)]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pfx</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Number of unique prefixes: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">rc_to_unique_prefixes</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set ff peers</span>
+        <span class="n">rc_to_ff_peers</span> <span class="o">=</span> <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">rc</span><span class="p">,</span> <span class="n">peer_to_prefixes</span> <span class="ow">in</span> <span class="n">rc_to_peer_to_prefixes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">peer</span><span class="p">,</span> <span class="n">prefixes</span> <span class="ow">in</span> <span class="n">peer_to_prefixes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">full_feed</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefixes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">FULL_FEED_RATIO</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">rc_to_unique_prefixes</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">full_feed</span><span class="p">:</span>
+                    <span class="n">rc_to_ff_peers</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">peer</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Peer </span><span class="si">%s</span><span class="s2"> of collector </span><span class="si">%s</span><span class="s2"> is </span><span class="si">%s</span><span class="s2">full-feed with </span><span class="si">%d</span><span class="s2"> prefixes&quot;</span><span class="p">,</span>
+                    <span class="n">peer</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">full_feed</span> <span class="k">else</span> <span class="s2">&quot;NOT &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefixes</span><span class="p">),</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Hand the selection to observers defined over it. IODA&#39;s visibility</span>
+        <span class="c1"># quorum is a share of exactly these peers. This happens</span>
+        <span class="c1"># before any element is replayed, so such an observer can accumulate</span>
+        <span class="c1"># from the RIB build itself instead of reading the table back.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">notify_full_feed_peers</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="p">(</span><span class="n">rc</span><span class="p">,</span> <span class="n">peer_asn</span><span class="p">,</span> <span class="n">peer_ip</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">rc</span><span class="p">,</span> <span class="n">peers</span> <span class="ow">in</span> <span class="n">rc_to_ff_peers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">peer_asn</span><span class="p">,</span> <span class="n">peer_ip</span> <span class="ow">in</span> <span class="n">peers</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="n">rc_to_rib_start</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">rc_to_rib_end</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Iterate a copy: a collector whose dump turned out to be empty is</span>
+        <span class="c1"># dropped from the list.</span>
+        <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">rc_to_rib_start</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">rc_to_rib_times</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span>
+                <span class="n">rc_to_rib_end</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rc_to_rib_times</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;The RIB dump the broker lists for </span><span class="si">%s</span><span class="s2"> at </span><span class="si">%s</span><span class="s2"> yielded no &quot;</span>
+                    <span class="s2">&quot;entries, dropping the collector&quot;</span><span class="p">,</span>
+                    <span class="n">rc</span><span class="p">,</span> <span class="n">rib_dumps</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                <span class="p">)</span>
+                <span class="n">rc_to_rib_times</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+                <span class="n">rc_to_ff_peers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Every collector&#39;s RIB dump before </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;was empty, so there is no table to build.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;RIBs start at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="n">timestamp_to_iso</span><span class="p">(</span><span class="n">rc_to_rib_start</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;RIBs end at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="n">timestamp_to_iso</span><span class="p">(</span><span class="n">rc_to_rib_end</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_start</span> <span class="o">=</span> <span class="n">rc_to_rib_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_end</span> <span class="o">=</span> <span class="n">rc_to_rib_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_ff_peers</span> <span class="o">=</span> <span class="n">rc_to_ff_peers</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_rib</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">n_elem</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Stream 2: one stream per collector, over that collector&#39;s dump instant</span>
+        <span class="c1"># alone, in dump order. A single stream spanning every collector&#39;s dump</span>
+        <span class="c1"># would also fetch and parse the update files between the earliest and</span>
+        <span class="c1"># the latest dump, and any intermediate dump of a collector that dumps</span>
+        <span class="c1"># more often, only to discard all of it below: a RIS collector dumping</span>
+        <span class="c1"># at 00:00 next to a Route Views one dumping at 02:00 cost two hours of</span>
+        <span class="c1"># everyone&#39;s updates and a whole extra table.</span>
+        <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_start</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">):</span>
+            <span class="n">from_time</span><span class="p">,</span> <span class="n">until_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_start</span><span class="p">[</span><span class="n">rc</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_end</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building </span><span class="si">%s</span><span class="s2"> from its dump at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">timestamp_to_iso</span><span class="p">(</span><span class="n">from_time</span><span class="p">))</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">BGPStream</span><span class="p">(</span>
+                <span class="n">ts_start</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">from_time</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">UTC</span><span class="p">),</span>
+                <span class="n">ts_end</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">until_time</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">UTC</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">RIB_BOUNDARY_MARGIN</span><span class="p">,</span>
+                <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ribs&quot;</span><span class="p">,</span> <span class="s2">&quot;updates&quot;</span><span class="p">],</span>
+                <span class="n">collectors</span><span class="o">=</span><span class="p">[</span><span class="n">rc</span><span class="p">],</span>
+                <span class="n">filters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span>
+                <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+                <span class="n">parser_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">n_elem</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_dump</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">rc</span><span class="p">)</span>
+
+        <span class="c1"># The table is complete: observers that need to read it back get their</span>
+        <span class="c1"># reference now, before the first dump.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">notify_built</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Built RIB from </span><span class="si">%d</span><span class="s2"> BGP elements in </span><span class="si">%.2f</span><span class="s2"> seconds&quot;</span><span class="p">,</span> <span class="n">n_elem</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">BGPElement</span><span class="p">],</span> <span class="n">rc</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load collector ``rc``&#39;s dump instant from ``stream`` into the table.</span>
+
+<span class="sd">        Returns the number of elements the stream yielded, kept or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_elem</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="n">n_elem</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">time</span>
+
+            <span class="c1"># A collector&#39;s RIB dump is a single instant. Every entry in an MRT</span>
+            <span class="c1"># table dump carries the dump&#39;s own timestamp, so `rib_start` and</span>
+            <span class="c1"># `rib_end` are the same second (verified on every pinned window: one</span>
+            <span class="c1"># distinct timestamp across 18M entries at route-views.eqix). Keep</span>
+            <span class="c1"># that instant and nothing else; `replay_updates` picks up after it.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_start</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">ts</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_end</span><span class="p">[</span><span class="n">rc</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="n">peer</span> <span class="o">=</span> <span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">peer_asn</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">peer_address</span><span class="p">)</span>
+
+            <span class="c1"># Optional peer filter</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullfeed_only</span> <span class="ow">and</span> <span class="n">peer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_ff_peers</span><span class="p">[</span><span class="n">rc</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># The stream types `as-path` as the wire string and every field as</span>
+            <span class="c1"># optional; `process_path` has just rewritten it to a list of ASNs, and</span>
+            <span class="c1"># only R/A/W elements exist. ParsedElement / WithdrawalElement say so.</span>
+            <span class="c1"># Reinterpreting costs nothing at runtime; see quickrib/elements.py.</span>
+            <span class="c1"># Both checkers see the seam here because `stream` is typed, where</span>
+            <span class="c1"># `BGPStream.__iter__` upstream is not, so both are told.</span>
+            <span class="c1"># Handle withdraw messages</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;W&quot;</span><span class="p">:</span>
+                <span class="c1"># A withdrawal for a prefix the peer does not have is expected</span>
+                <span class="c1"># while the RIB is still being built, and `update_withdrawal`</span>
+                <span class="c1"># handles it. Anything else is a bug and must not be swallowed.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">update_withdrawal</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]  # ty: ignore[invalid-argument-type]</span>
+                <span class="k">continue</span>
+
+            <span class="n">as_path</span> <span class="o">=</span> <span class="n">process_path</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">as_path</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;as-path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">as_path</span>  <span class="c1"># pyright: ignore[reportGeneralTypeIssues]  # ty: ignore[invalid-assignment]</span>
+
+            <span class="c1"># Handle RIB message</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">update_rib</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]  # ty: ignore[invalid-argument-type]</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Handle announcement message</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">update_announcement</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]  # ty: ignore[invalid-argument-type]</span>
+                <span class="k">continue</span>
+        <span class="k">return</span> <span class="n">n_elem</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">replay_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="n">start_ts</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_end</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="c1"># Stream 3: Update the RIB</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">BGPStream</span><span class="p">(</span>
+            <span class="n">ts_start</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">start_ts</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">UTC</span><span class="p">),</span>
+            <span class="n">ts_end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">,</span>
+            <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;updates&quot;</span><span class="p">],</span>
+            <span class="n">collectors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">,</span>
+            <span class="n">filters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span>
+            <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+            <span class="n">parser_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parser</span>
+        <span class="p">)</span>
+
+        <span class="n">n_elem</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">next_dump_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_res</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="n">n_elem</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">rc</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">collector</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">time</span>
+
+            <span class="c1"># Every boundary this element proves has passed, not just the first:</span>
+            <span class="c1"># a gap in the stream wider than `dump_res` must not cost the windows</span>
+            <span class="c1"># it spans, nor leave the schedule behind for the rest of the run.</span>
+            <span class="k">if</span> <span class="n">ts</span> <span class="o">&gt;</span> <span class="n">next_dump_time</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="n">elapsed_dump_boundaries</span><span class="p">(</span><span class="n">next_dump_time</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_res</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">UTC</span><span class="p">))</span>
+                    <span class="n">next_dump_time</span> <span class="o">=</span> <span class="n">boundary</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_res</span>
+
+            <span class="c1"># Everything up to and including this collector&#39;s dump instant is</span>
+            <span class="c1"># already in the table: `build_rib` applied the dump itself and any</span>
+            <span class="c1"># update sharing its timestamp. The stream starts at the *earliest*</span>
+            <span class="c1"># collector&#39;s dump, so without this a collector that dumps later has</span>
+            <span class="c1"># its updates replayed a second time, and the ones predating its own</span>
+            <span class="c1"># dump applied on top of a newer table. Measured on the pinned</span>
+            <span class="c1"># 2010 window, that was 895 of route-views.wide&#39;s 31,956 updates</span>
+            <span class="c1"># (2.8%) and 114 of rrc04&#39;s 70,044, purely because the two collectors</span>
+            <span class="c1"># dump a minute apart.</span>
+            <span class="k">if</span> <span class="n">ts</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_end</span><span class="p">[</span><span class="n">rc</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="n">peer</span> <span class="o">=</span> <span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">peer_asn</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">peer_address</span><span class="p">)</span>
+
+            <span class="c1"># Optional peer filter</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullfeed_only</span> <span class="ow">and</span> <span class="n">peer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_ff_peers</span><span class="p">[</span><span class="n">rc</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># The stream types `as-path` as the wire string and every field as</span>
+            <span class="c1"># optional; `process_path` has just rewritten it to a list of ASNs, and</span>
+            <span class="c1"># only R/A/W elements exist. ParsedElement / WithdrawalElement say so.</span>
+            <span class="c1"># Reinterpreting costs nothing at runtime; see quickrib/elements.py.</span>
+            <span class="c1"># Handle withdraw messages</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;W&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">update_withdrawal</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+                <span class="k">continue</span>
+
+            <span class="n">as_path</span> <span class="o">=</span> <span class="n">process_path</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">as_path</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;as-path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">as_path</span>  <span class="c1"># pyright: ignore[reportGeneralTypeIssues]</span>
+
+            <span class="c1"># Handle announcement message</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">update_announcement</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+
+        <span class="c1"># Boundaries the stream ran out before reaching. Their windows are over,</span>
+        <span class="c1"># since `end_time` has passed them; they simply have no message left to</span>
+        <span class="c1"># prove it. A series with a hole at the end is worse than one whose last</span>
+        <span class="c1"># bins report a quiet network.</span>
+        <span class="k">for</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="n">elapsed_dump_boundaries</span><span class="p">(</span>
+            <span class="n">next_dump_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">timestamp</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_res</span><span class="p">,</span> <span class="n">inclusive</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">UTC</span><span class="p">))</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Updated RIB from </span><span class="si">%d</span><span class="s2"> BGP elements in </span><span class="si">%.2f</span><span class="s2"> seconds&quot;</span><span class="p">,</span> <span class="n">n_elem</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Step 1: initialization&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize_processing</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Step 2: build rib&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_rib</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Step 3: replay updates&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replay_updates</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="quickrib.quickrib.QuickRIB.initialize_processing" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">initialize_processing</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize route collector RIB processing.</p>
+<p>This function initializes the processing of Routing Information Base (RIB) data every route collectors.
+It returns the start and end times of each collectors's RIB and identifies the full-feed peers.</p>
+<p>Sets <code>rc_to_rib_start</code>, <code>rc_to_rib_end</code> and <code>rc_to_ff_peers</code> on the
+instance, and hands the full-feed selection to the observers.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/quickrib/quickrib.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialize route collector RIB processing.</span>
+
+<span class="sd">    This function initializes the processing of Routing Information Base (RIB) data every route collectors.</span>
+<span class="sd">    It returns the start and end times of each collectors&#39;s RIB and identifies the full-feed peers.</span>
+
+<span class="sd">    Sets ``rc_to_rib_start``, ``rc_to_rib_end`` and ``rc_to_ff_peers`` on the</span>
+<span class="sd">    instance, and hands the full-feed selection to the observers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Where each collector&#39;s table actually is. `start_time` does not have</span>
+    <span class="c1"># to sit on a dump: the reconstruction starts from the last dump before</span>
+    <span class="c1"># it, and `replay_updates` replays the interval in between.</span>
+    <span class="n">rib_dumps</span> <span class="o">=</span> <span class="n">latest_rib_dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rib_lookback</span><span class="p">)</span>
+
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">rc</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span> <span class="k">if</span> <span class="n">rc</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rib_dumps</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;No RIB dump for collector </span><span class="si">%s</span><span class="s2"> in the </span><span class="si">%s</span><span class="s2"> before </span><span class="si">%s</span><span class="s2">, dropping it&quot;</span><span class="p">,</span>
+            <span class="n">rc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rib_lookback</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;No collector has a RIB dump in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rib_lookback</span><span class="si">}</span><span class="s2"> before &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">, so there is no table to build. &quot;</span>
+            <span class="s2">&quot;Check the collector names, or widen `rib_lookback`.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">rc</span><span class="p">,</span> <span class="n">dump_time</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rib_dumps</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="n">catch_up</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">-</span> <span class="n">dump_time</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> dumps at </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2"> before start_time&quot;</span><span class="p">,</span>
+            <span class="n">rc</span><span class="p">,</span> <span class="n">dump_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">catch_up</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Stream #1: count unique prefixes and identify FF peers, one collector</span>
+    <span class="c1"># at a time. Collectors dump at different instants, and a single window</span>
+    <span class="c1"># spanning all of them would pull in every intermediate dump of the</span>
+    <span class="c1"># collectors that dump more often.</span>
+    <span class="n">rc_to_rib_times</span> <span class="o">=</span> <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">}</span>
+    <span class="n">rc_to_peer_to_prefixes</span> <span class="o">=</span> <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">}</span>
+    <span class="n">rc_to_unique_prefixes</span> <span class="o">=</span> <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">:</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">BGPStream</span><span class="p">(</span>
+            <span class="n">ts_start</span><span class="o">=</span><span class="n">rib_dumps</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span> <span class="o">-</span> <span class="n">RIB_DUMP_MARGIN</span><span class="p">,</span>
+            <span class="n">ts_end</span><span class="o">=</span><span class="n">rib_dumps</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span> <span class="o">+</span> <span class="n">RIB_DUMP_MARGIN</span><span class="p">,</span>
+            <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ribs&quot;</span><span class="p">],</span>
+            <span class="n">collectors</span><span class="o">=</span><span class="p">[</span><span class="n">rc</span><span class="p">],</span>
+            <span class="n">filters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span>
+            <span class="n">cache_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+            <span class="n">parser_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="n">ts</span><span class="p">,</span> <span class="n">pfx</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
+            <span class="n">rc_to_rib_times</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+            <span class="n">rc_to_unique_prefixes</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pfx</span><span class="p">)</span>
+            <span class="n">rc_to_peer_to_prefixes</span><span class="p">[</span><span class="n">rc</span><span class="p">][(</span><span class="n">elem</span><span class="o">.</span><span class="n">peer_asn</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">peer_address</span><span class="p">)]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pfx</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Number of unique prefixes: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">rc_to_unique_prefixes</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Set ff peers</span>
+    <span class="n">rc_to_ff_peers</span> <span class="o">=</span> <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">rc</span><span class="p">,</span> <span class="n">peer_to_prefixes</span> <span class="ow">in</span> <span class="n">rc_to_peer_to_prefixes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">peer</span><span class="p">,</span> <span class="n">prefixes</span> <span class="ow">in</span> <span class="n">peer_to_prefixes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">full_feed</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefixes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">FULL_FEED_RATIO</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">rc_to_unique_prefixes</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">full_feed</span><span class="p">:</span>
+                <span class="n">rc_to_ff_peers</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">peer</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Peer </span><span class="si">%s</span><span class="s2"> of collector </span><span class="si">%s</span><span class="s2"> is </span><span class="si">%s</span><span class="s2">full-feed with </span><span class="si">%d</span><span class="s2"> prefixes&quot;</span><span class="p">,</span>
+                <span class="n">peer</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">full_feed</span> <span class="k">else</span> <span class="s2">&quot;NOT &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefixes</span><span class="p">),</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Hand the selection to observers defined over it. IODA&#39;s visibility</span>
+    <span class="c1"># quorum is a share of exactly these peers. This happens</span>
+    <span class="c1"># before any element is replayed, so such an observer can accumulate</span>
+    <span class="c1"># from the RIB build itself instead of reading the table back.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rib</span><span class="o">.</span><span class="n">notify_full_feed_peers</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="p">(</span><span class="n">rc</span><span class="p">,</span> <span class="n">peer_asn</span><span class="p">,</span> <span class="n">peer_ip</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">rc</span><span class="p">,</span> <span class="n">peers</span> <span class="ow">in</span> <span class="n">rc_to_ff_peers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">peer_asn</span><span class="p">,</span> <span class="n">peer_ip</span> <span class="ow">in</span> <span class="n">peers</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">rc_to_rib_start</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">rc_to_rib_end</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Iterate a copy: a collector whose dump turned out to be empty is</span>
+    <span class="c1"># dropped from the list.</span>
+    <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rc_to_rib_start</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">rc_to_rib_times</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span>
+            <span class="n">rc_to_rib_end</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rc_to_rib_times</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;The RIB dump the broker lists for </span><span class="si">%s</span><span class="s2"> at </span><span class="si">%s</span><span class="s2"> yielded no &quot;</span>
+                <span class="s2">&quot;entries, dropping the collector&quot;</span><span class="p">,</span>
+                <span class="n">rc</span><span class="p">,</span> <span class="n">rib_dumps</span><span class="p">[</span><span class="n">rc</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="p">)</span>
+            <span class="n">rc_to_rib_times</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+            <span class="n">rc_to_ff_peers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Every collector&#39;s RIB dump before </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;was empty, so there is no table to build.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;RIBs start at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="n">timestamp_to_iso</span><span class="p">(</span><span class="n">rc_to_rib_start</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;RIBs end at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="n">rc</span><span class="p">:</span> <span class="n">timestamp_to_iso</span><span class="p">(</span><span class="n">rc_to_rib_end</span><span class="p">[</span><span class="n">rc</span><span class="p">])</span> <span class="k">for</span> <span class="n">rc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectors</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_start</span> <span class="o">=</span> <span class="n">rc_to_rib_start</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_rib_end</span> <span class="o">=</span> <span class="n">rc_to_rib_end</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rc_to_ff_peers</span> <span class="o">=</span> <span class="n">rc_to_ff_peers</span>
+    <span class="k">return</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="helpers">Helpers</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="quickrib.quickrib.process_path" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">quickrib</span><span class="o">.</span><span class="n">quickrib</span><span class="o">.</span><span class="n">process_path</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>The element's AS path as a list of ASNs, or <code>[]</code> to drop the element.</p>
+<p>Credit to CAIDA https://bgpstream.caida.org/docs/tutorials/pybgpstream</p>
+<p>An empty result is the caller's signal to skip the element entirely. Three
+things earn it:</p>
+<ul>
+<li><strong>no path at all</strong>: nothing to reconstruct a route from;</li>
+<li><strong>an AS set</strong> (<code>{64500,64501}</code>): an aggregate stands for several origins
+  at once, and every consumer here assumes <code>path[-1]</code> is <em>the</em> origin, so
+  these are dropped rather than guessed at;</li>
+<li><strong>a path that does not start at the peer</strong>, which is malformed: a route
+  learned from a peer begins with that peer's ASN.</li>
+</ul>
+<p>A <strong>single-ASN path</strong> is none of those: it is well-formed, and means the peer
+originates the prefix itself. Those are kept. They are rare (0.02% of RIB
+entries on the pinned windows: 604 prefixes across 17 peers in 2010, 3,487
+across 28 peers in 2022) but they are real routes, and dropping them made a
+full-feed peer's own address space invisible to every observer downstream,
+which matters most to per-origin signals like IODA's. Such a path has no AS
+<em>link</em> in it, so anything reading consecutive pairs simply sees none; the
+origin (<code>path[-1]</code>) is the peer itself.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/quickrib/quickrib.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">process_path</span><span class="p">(</span><span class="n">elem</span><span class="p">:</span> <span class="n">BGPElement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The element&#39;s AS path as a list of ASNs, or ``[]`` to drop the element.</span>
+
+<span class="sd">    Credit to CAIDA https://bgpstream.caida.org/docs/tutorials/pybgpstream</span>
+
+<span class="sd">    An empty result is the caller&#39;s signal to skip the element entirely. Three</span>
+<span class="sd">    things earn it:</span>
+
+<span class="sd">    * **no path at all**: nothing to reconstruct a route from;</span>
+<span class="sd">    * **an AS set** (``{64500,64501}``): an aggregate stands for several origins</span>
+<span class="sd">      at once, and every consumer here assumes ``path[-1]`` is *the* origin, so</span>
+<span class="sd">      these are dropped rather than guessed at;</span>
+<span class="sd">    * **a path that does not start at the peer**, which is malformed: a route</span>
+<span class="sd">      learned from a peer begins with that peer&#39;s ASN.</span>
+
+<span class="sd">    A **single-ASN path** is none of those: it is well-formed, and means the peer</span>
+<span class="sd">    originates the prefix itself. Those are kept. They are rare (0.02% of RIB</span>
+<span class="sd">    entries on the pinned windows: 604 prefixes across 17 peers in 2010, 3,487</span>
+<span class="sd">    across 28 peers in 2022) but they are real routes, and dropping them made a</span>
+<span class="sd">    full-feed peer&#39;s own address space invisible to every observer downstream,</span>
+<span class="sd">    which matters most to per-origin signals like IODA&#39;s. Such a path has no AS</span>
+<span class="sd">    *link* in it, so anything reading consecutive pairs simply sees none; the</span>
+<span class="sd">    origin (``path[-1]``) is the peer itself.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">raw_path</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;as-path&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">raw_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="c1"># An AS set is written `{64500,64501}` on the wire, so one scan of the</span>
+    <span class="c1"># string settles it before anything is split or allocated.</span>
+    <span class="k">if</span> <span class="s2">&quot;{&quot;</span> <span class="ow">in</span> <span class="n">raw_path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">as_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+    <span class="c1"># Sanitize weird BGP data: a route learned from a peer begins with that</span>
+    <span class="c1"># peer&#39;s ASN.</span>
+    <span class="k">if</span> <span class="n">as_path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">peer_asn</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">as_path</span>
+
+    <span class="k">return</span> <span class="p">[]</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="quickrib.quickrib.elapsed_dump_boundaries" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">quickrib</span><span class="o">.</span><span class="n">quickrib</span><span class="o">.</span><span class="n">elapsed_dump_boundaries</span><span class="p">(</span><span class="n">next_dump_time</span><span class="p">,</span> <span class="n">until</span><span class="p">,</span> <span class="n">dump_res</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Yield every dump boundary from <code>next_dump_time</code> that <code>until</code> has passed.</p>
+<p>The schedule is absolute (<code>start_time + k * dump_res</code>), so a window is due
+once time has moved past its boundary, however many messages happened to
+arrive in it. Yielding <em>all</em> of them is what keeps a gap in the stream from
+costing the windows it spans: advancing the boundary only once per arriving
+element leaves the schedule permanently behind the stream, and dumping stops
+for the rest of the run.</p>
+<p><code>until</code> is exclusive while the stream is running, because an element at
+exactly the boundary belongs to the window that boundary opens. It is
+inclusive for the final flush, where <code>until</code> is <code>end_time</code> and a boundary
+landing on it closes a window that is genuinely over.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/quickrib/quickrib.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">elapsed_dump_boundaries</span><span class="p">(</span>
+    <span class="n">next_dump_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">until</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dump_res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inclusive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield every dump boundary from ``next_dump_time`` that ``until`` has passed.</span>
+
+<span class="sd">    The schedule is absolute (``start_time + k * dump_res``), so a window is due</span>
+<span class="sd">    once time has moved past its boundary, however many messages happened to</span>
+<span class="sd">    arrive in it. Yielding *all* of them is what keeps a gap in the stream from</span>
+<span class="sd">    costing the windows it spans: advancing the boundary only once per arriving</span>
+<span class="sd">    element leaves the schedule permanently behind the stream, and dumping stops</span>
+<span class="sd">    for the rest of the run.</span>
+
+<span class="sd">    ``until`` is exclusive while the stream is running, because an element at</span>
+<span class="sd">    exactly the boundary belongs to the window that boundary opens. It is</span>
+<span class="sd">    inclusive for the final flush, where ``until`` is ``end_time`` and a boundary</span>
+<span class="sd">    landing on it closes a window that is genuinely over.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">next_dump_time</span> <span class="o">&lt;=</span> <span class="n">until</span><span class="p">)</span> <span class="k">if</span> <span class="n">inclusive</span> <span class="k">else</span> <span class="p">(</span><span class="n">next_dump_time</span> <span class="o">&lt;</span> <span class="n">until</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">next_dump_time</span>
+        <span class="n">next_dump_time</span> <span class="o">+=</span> <span class="n">dump_res</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+      
+    
+  </body>
+</html>

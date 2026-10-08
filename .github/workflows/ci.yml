@@ -27,7 +27,9 @@ jobs:
       # includes the examples' `pybgpstream`, which needs the libbgpstream
       # C library the runner does not have.
       - run: uv sync --python ${{ matrix.python }} --no-default-groups --group test
-      - run: uv run pytest
+      # `--no-sync`: `uv run` otherwise re-syncs with the default groups and
+      # undoes the step above.
+      - run: uv run --no-sync pytest
 
   lint-and-types:
     name: ruff, ty, pyright

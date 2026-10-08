@@ -23,7 +23,10 @@ jobs:
         with:
           enable-cache: true
       - run: uv python install ${{ matrix.python }}
-      - run: uv sync --python ${{ matrix.python }} --group test
+      # `--no-default-groups`: the `dev` group is installed by default and
+      # includes the examples' `pybgpstream`, which needs the libbgpstream
+      # C library the runner does not have.
+      - run: uv sync --python ${{ matrix.python }} --no-default-groups --group test
       - run: uv run pytest
 
   lint-and-types:
@@ -34,10 +37,9 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - run: uv sync --group test
-      # pyright and ty check examples/ too, so they need its imports. The
-      # `examples` group is not synced whole because `pybgpstream` needs the
-      # libbgpstream C library, which the runner does not have.
+      - run: uv sync --no-default-groups --group test
+      # pyright and ty check examples/ too, so they need its imports; the
+      # `examples` group is not synced whole for the reason above.
       - run: uv pip install marimo matplotlib polars
       - run: uvx ruff check
       - run: uvx ty check
